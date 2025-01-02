@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   console.log(process.env.MONGO_URI);
   try {
-    const con = await mongoose.connect(process.env.MONGO_URI);
+    const con = await mongoose.connect(process.env.MONGO_URI, {});
 
     console.log(
       `MongoDB Connected: ${con.connection.host}`.cyan.underline.bold
