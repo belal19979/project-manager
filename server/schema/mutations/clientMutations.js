@@ -1,6 +1,7 @@
 const { GraphQLNonNull, GraphQLString, GraphQLID } = require("graphql");
 const ClientType = require("../types/ClientType");
 const Client = require("../../models/Client");
+const Project = require("../../models/Project");
 
 const addClient = {
   type: ClientType,
@@ -22,8 +23,20 @@ const addClient = {
 const deleteClient = {
   type: ClientType,
   args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-  resolve(parent, args) {
-    return Client.findByIdAndDelete(args.id);
+  async resolve(parent, args) {
+    try {
+      const projects = await Project.find({ clientId: args.id });
+      console.log("Found projects:", projects);
+      for (let project of projects) {
+        await Project.findByIdAndDelete(project._id);
+      }
+
+      const deletedClient = await Client.findByIdAndDelete(args.id);
+      return deletedClient;
+    } catch (error) {
+      console.error("Error in deleteClient resolver:", error);
+      throw error;
+    }
   },
 };
 
